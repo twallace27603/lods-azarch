@@ -1,0 +1,183 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "tswblobtrackingAdminLogin": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tswblobtrackingAdminLoginPassword": {
+      "type": "securestring"
+    },
+    "BlobTrackingName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "BlobTrackingCollation": {
+      "type": "string",
+      "minLength": 1,
+      "defaultValue": "SQL_Latin1_General_CP1_CI_AS"
+    },
+    "BlobTrackingEdition": {
+      "type": "string",
+      "defaultValue": "Basic",
+      "allowedValues": [
+        "Basic",
+        "Standard",
+        "Premium"
+      ]
+    },
+    "BlobTrackingRequestedServiceObjectiveName": {
+      "type": "string",
+      "defaultValue": "Basic",
+      "allowedValues": [
+        "Basic",
+        "S0",
+        "S1",
+        "S2",
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "metadata": {
+        "description": "Describes the performance level for Edition"
+      }
+    },
+    "tswblobtrackingType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_ZRS",
+        "Standard_GRS",
+        "Standard_RAGRS",
+        "Premium_LRS"
+      ]
+    },
+    "tswblobtracking-ASPName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tswblobtracking-ASPSkuName": {
+      "type": "string",
+      "defaultValue": "F1",
+      "allowedValues": [
+        "F1",
+        "D1",
+        "B1",
+        "B2",
+        "B3",
+        "S1",
+        "S2",
+        "S3",
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "metadata": {
+        "description": "Describes plan's pricing tier and capacity. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
+      }
+    }},
+  "variables": {
+    "tswblobtrackingName": "[concat('tswblobtracking', uniqueString(resourceGroup().id))]",
+    "tswblobtracking2Name": "[concat('tswblobtracking2', uniqueString(resourceGroup().id))]",
+    "tswblobtracking3Name": "[concat('tswblobtracking3', uniqueString(resourceGroup().id))]"},
+  "resources": [
+    {
+      "name": "[variables('tswblobtrackingName')]",
+      "type": "Microsoft.Sql/servers",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2014-04-01-preview",
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "tswblobtracking"
+      },
+      "properties": {
+        "administratorLogin": "[parameters('tswblobtrackingAdminLogin')]",
+        "administratorLoginPassword": "[parameters('tswblobtrackingAdminLoginPassword')]"
+      },
+      "resources": [
+        {
+          "name": "AllowAllWindowsAzureIps",
+          "type": "firewallrules",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2014-04-01-preview",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('tswblobtrackingName'))]"
+          ],
+          "properties": {
+            "startIpAddress": "0.0.0.0",
+            "endIpAddress": "0.0.0.0"
+          }
+        },
+        {
+          "name": "[parameters('BlobTrackingName')]",
+          "type": "databases",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2014-04-01-preview",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('tswblobtrackingName'))]"
+          ],
+          "tags": {
+            "displayName": "BlobTracking"
+          },
+          "properties": {
+            "collation": "[parameters('BlobTrackingCollation')]",
+            "edition": "[parameters('BlobTrackingEdition')]",
+            "maxSizeBytes": "1073741824",
+            "requestedServiceObjectiveName": "[parameters('BlobTrackingRequestedServiceObjectiveName')]"
+          }
+        }
+      ]
+    },
+    {
+      "name": "[variables('tswblobtracking2Name')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-01-01",
+      "sku": {
+        "name": "[parameters('tswblobtrackingType')]"
+      },
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "tswblobtracking"
+      },
+      "kind": "Storage"
+    },
+    {
+      "name": "[parameters('tswblobtracking-ASPName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-08-01",
+      "sku": {
+        "name": "[parameters('tswblobtracking-ASPSkuName')]"
+      },
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "tswblobtracking-ASP"
+      },
+      "properties": {
+        "name": "[parameters('tswblobtracking-ASPName')]",
+        "numberOfWorkers": 1
+      }
+    },
+    {
+      "name": "[variables('tswblobtracking3Name')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', parameters('tswblobtracking-ASPName'))]"
+      ],
+      "tags": {
+        "[concat('hidden-related:', resourceId('Microsoft.Web/serverfarms', parameters('tswblobtracking-ASPName')))]": "Resource",
+        "displayName": "tswblobtracking"
+      },
+      "properties": {
+        "name": "[variables('tswblobtracking3Name')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('tswblobtracking-ASPName'))]"
+      }
+    }],
+  "outputs": {}
+}
