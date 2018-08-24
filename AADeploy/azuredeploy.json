@@ -9,7 +9,13 @@
     "labPassword": {
       "type": "string",
       "defaultValue": "Pa$$w0rd"
+    },
+    "blobTrackingSchemaStorageUri": {
+      "type": "string",
+      "minLength": 1,
+      "defaultValue": "https://tswlodschallenges.blob.core.windows.net/artifacts/ArchitectureDB.bacpac"
     }
+
   },
   "variables": {
     "sqlServerName": "[concat('sql',parameters('labInstanceId'))]",
@@ -70,7 +76,28 @@
             "edition": "[variables('dbEdition')]",
             "maxSizeBytes": "1073741824",
             "requestedServiceObjectiveName": "[variables('dbServiceLevelObjective')]"
-          }
+          },
+          "resources": [
+            {
+              "name": "blobTrackingSchema",
+              "type": "extensions",
+              "apiVersion": "2014-04-01-preview",
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', split(concat(variables('sqlServerName'), '/', variables('databaseName')), '/')[0], split(concat(variables('sqlServerName'), '/', variables('databaseName')), '/')[1])]"
+              ],
+              "tags": {
+                "displayName": "blobTrackingSchema"
+              },
+              "properties": {
+                "storageKeyType": "SharedAccessKey",
+                "storageKey": "?",
+                "storageUri": "[parameters('blobTrackingSchemaStorageUri')]",
+                "administratorLogin": "[variables('sqlAdmin')]",
+                "administratorLoginPassword": "[variables('sqlPassword')]",
+                "operationMode": "Import"
+              }
+            }
+          ]
         }
       ]
     },

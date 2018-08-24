@@ -7,6 +7,8 @@ Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "AADeploy", "AADeploy\AADepl
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "DocumentStatus", "DocumentStatus\DocumentStatus.sqlproj", "{B51199DD-CB6C-4009-AB89-20C3A6D43BC0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "aachallenges", "aachallenges\aachallenges.csproj", "{0E55E911-4654-4A89-8E07-5992832A79D5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{B51199DD-CB6C-4009-AB89-20C3A6D43BC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B51199DD-CB6C-4009-AB89-20C3A6D43BC0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B51199DD-CB6C-4009-AB89-20C3A6D43BC0}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{0E55E911-4654-4A89-8E07-5992832A79D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E55E911-4654-4A89-8E07-5992832A79D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E55E911-4654-4A89-8E07-5992832A79D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E55E911-4654-4A89-8E07-5992832A79D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
