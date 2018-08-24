@@ -1,0 +1,6 @@
+﻿CREATE TABLE [dbo].[documentStatus]
+(
+	[Id] VARCHAR(300) NOT NULL PRIMARY KEY,
+	[Name] VARCHAR(100) NOT NULL,
+	[ProcessDate] DATETIME2 NOT NULL
+)
