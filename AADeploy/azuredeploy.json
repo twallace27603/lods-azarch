@@ -23,7 +23,6 @@
       "type": "int",
       "defaultValue": 63
     }
-    
 
   },
   "variables": {
@@ -48,7 +47,7 @@
       "type": "Microsoft.Sql/servers",
       "location": "[resourceGroup().location]",
       "apiVersion": "2014-04-01-preview",
-      "dependsOn": [ ],
+      "dependsOn": [],
       "tags": {
         "displayName": "SQL Server"
       },
@@ -88,6 +87,25 @@
             "requestedServiceObjectiveName": "[variables('dbServiceLevelObjective')]"
           },
           "resources": [
+            {
+              "name": "schema",
+              "type": "extensions",
+              "apiVersion": "2014-04-01-preview",
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', split(concat(variables('sqlServerName'), '/', variables('databaseName')), '/')[0], split(concat(variables('sqlServerName'), '/', variables('databaseName')), '/')[1])]"
+              ],
+              "tags": {
+                "displayName": "schema"
+              },
+              "properties": {
+                "storageKeyType": "SharedAccessKey",
+                "storageKey": "?",
+                "storageUri": "[parameters('blobTrackingSchemaStorageUri')]",
+                "administratorLogin": "[variables('sqlAdmin')]",
+                "administratorLoginPassword": "[variables('sqlPassword')]",
+                "operationMode": "Import"
+              }
+            }
           ]
         }
       ]
@@ -100,7 +118,7 @@
       "sku": {
         "name": "[variables('storageAccountSku')]"
       },
-      "dependsOn": [ ],
+      "dependsOn": [],
       "tags": {
         "displayName": "Storage Account"
       },
@@ -114,7 +132,7 @@
       "sku": {
         "name": "[variables('aspSku')]"
       },
-      "dependsOn": [ ],
+      "dependsOn": [],
       "tags": {
         "displayName": "App Service Plan"
       },
@@ -201,6 +219,7 @@
           }
         }
       ]
-    }],
+    }
+  ],
   "outputs": {}
 }

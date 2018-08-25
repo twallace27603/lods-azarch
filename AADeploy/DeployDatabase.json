@@ -24,7 +24,7 @@
   },
   "resources": [
     {
-      "name": "[concat(variables('sqlServerName'),'databases',variables('databaseName'), '/', 'DatabaseImport')]",
+      "name": "[concat(variables('sqlServerName'),'/databases/',variables('databaseName'), '/', 'DatabaseImport')]",
       "type": "Microsoft.Sql/servers/databases/extensions",
       "apiVersion": "2014-04-01-preview",
       "dependsOn": [],
