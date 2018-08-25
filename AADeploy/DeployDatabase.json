@@ -14,9 +14,6 @@
     "labPassword": {
       "type": "string",
       "defaultValue": "Pa$$w0rd"
-    },
-    "serverDatabaseName": {
-      "type": "string"
     }
   },
   "variables": {
@@ -24,11 +21,10 @@
     "databaseName": "blobTracking",
     "sqlAdmin": "student",
     "sqlPassword": "[concat('Azure!',parameters('labPassword'))]"
-
   },
   "resources": [
     {
-      "name": "[concat(parameters('serverDatabaseName'), '/', 'DatabaseImport')]",
+      "name": "[concat(variables('sqlServerName'), '/', 'DatabaseImport')]",
       "type": "Microsoft.Sql/servers/databases/extensions",
       "apiVersion": "2014-04-01-preview",
       "dependsOn": [],
@@ -44,6 +40,7 @@
         "operationMode": "Import"
       }
     }
+
   ],
   "outputs": {
   }
