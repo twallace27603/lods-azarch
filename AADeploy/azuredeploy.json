@@ -14,7 +14,16 @@
       "type": "string",
       "minLength": 1,
       "defaultValue": "https://tswlodschallenges.blob.core.windows.net/artifacts/ArchitectureDB.bacpac"
+    },
+    "webAppDeployUri": {
+      "type": "string",
+      "defaultValue": "https://github.com/twallace27603/lods-azarch/blob/master/aachallenges/deploy/aachallenges.zip?raw=true"
+    },
+    "testType": {
+      "type": "int",
+      "defaultValue": 63
     }
+    
 
   },
   "variables": {
@@ -24,6 +33,7 @@
     "webAppName": "[concat('lods',parameters('labInstanceId'))]",
     "appServicePlanName": "[concat('asp-',parameters('labInstanceId'))]",
     "storageAccountSku": "Standard_LRS",
+    "storageAccountId": "[concat(resourceGroup().id,'/providers/Microsoft.Storage/storageAccounts/', variables('storageName'))]",
     "aspSku": "S1",
     "sqlAdmin": "student",
     "sqlPassword": "[concat('Azure!',parameters('labPassword'))]",
@@ -40,7 +50,7 @@
       "apiVersion": "2014-04-01-preview",
       "dependsOn": [ ],
       "tags": {
-        "displayName": "tswblobtracking"
+        "displayName": "SQL Server"
       },
       "properties": {
         "administratorLogin": "[variables('sqlAdmin')]",
@@ -69,7 +79,7 @@
             "[resourceId('Microsoft.Sql/servers', variables('sqlServerName'))]"
           ],
           "tags": {
-            "displayName": "BlobTracking"
+            "displayName": "SQL Database"
           },
           "properties": {
             "collation": "[variables('dbCollation')]",
@@ -78,25 +88,6 @@
             "requestedServiceObjectiveName": "[variables('dbServiceLevelObjective')]"
           },
           "resources": [
-            {
-              "name": "blobTrackingSchema",
-              "type": "extensions",
-              "apiVersion": "2014-04-01-preview",
-              "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', split(concat(variables('sqlServerName'), '/', variables('databaseName')), '/')[0], split(concat(variables('sqlServerName'), '/', variables('databaseName')), '/')[1])]"
-              ],
-              "tags": {
-                "displayName": "blobTrackingSchema"
-              },
-              "properties": {
-                "storageKeyType": "SharedAccessKey",
-                "storageKey": "?",
-                "storageUri": "[parameters('blobTrackingSchemaStorageUri')]",
-                "administratorLogin": "[variables('sqlAdmin')]",
-                "administratorLoginPassword": "[variables('sqlPassword')]",
-                "operationMode": "Import"
-              }
-            }
           ]
         }
       ]
@@ -125,7 +116,7 @@
       },
       "dependsOn": [ ],
       "tags": {
-        "displayName": "tswblobtracking-ASP"
+        "displayName": "App Service Plan"
       },
       "properties": {
         "name": "[variables('appServicePlanName')]",
@@ -142,12 +133,74 @@
       ],
       "tags": {
         "[concat('hidden-related:', resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName')))]": "Resource",
-        "displayName": "tswblobtracking"
+        "displayName": "Web App"
       },
       "properties": {
         "name": "[variables('webAppName')]",
+        "siteConfig": {
+          "AlwaysOn": true
+        },
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
-      }
+      },
+      "resources": [
+        {
+          "apiVersion": "2015-08-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('webAppName'))]"
+          ],
+          "location": "[resourceGroup().location]",
+          "name": "MSDeploy",
+          "properties": {
+            "packageUri": "[parameters('webAppDeployUri')]",
+            "dbType": "None",
+            "connectionString": "",
+            "setParameters": {
+              "IIS Web Application Name": "[variables('webAppName')]"
+            }
+          },
+          "tags": {
+            "displayName": "App Code Deployment"
+          },
+          "type": "extensions"
+        },
+        {
+          "name": "appsettings",
+          "type": "config",
+          "apiVersion": "2015-08-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('webappName'))]",
+            "[concat(resourceId('Microsoft.Web/sites', variables('webappName')),'/extensions/MSDeploy')]"
+
+          ],
+          "tags": {
+            "displayName": "webAppSettings"
+          },
+          "properties": {
+            "testType": "[parameters('testType')]"
+          }
+
+        },
+        {
+          "apiVersion": "2015-08-01",
+          "name": "connectionstrings",
+          "type": "config",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('webappName'))]",
+            "[concat(resourceId('Microsoft.Web/sites', variables('webappName')),'/extensions/MSDeploy')]",
+            "[concat(resourceId('Microsoft.Web/sites', variables('webappName')),'/config/appsettings')]"
+          ],
+          "properties": {
+            "storageAccount": {
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageName'),';AccountKey=',concat(listKeys(variables('storageAccountId'),'2015-05-01-preview').key1))]",
+              "type": "Custom"
+            },
+            "sqlConnection": {
+              "value": "[concat('Server=tcp:',variables('sqlServerName'),'.database.windows.net,1433;Initial Catalog=blobTracking;Persist Security Info=False;User ID=',variables('sqlAdmin'),';Password=',variables('sqlPassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;')]",
+              "type": "SQLAzure"
+            }
+          }
+        }
+      ]
     }],
   "outputs": {}
 }

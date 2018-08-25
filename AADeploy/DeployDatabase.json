@@ -1,0 +1,50 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "blobTrackingSchemaStorageUri": {
+      "type": "string",
+      "minLength": 1,
+      "defaultValue": "https://tswlodschallenges.blob.core.windows.net/artifacts/ArchitectureDB.bacpac"
+    },
+    "labInstanceId": {
+      "type": "string",
+      "defaultValue": "lods12345abc"
+    },
+    "labPassword": {
+      "type": "string",
+      "defaultValue": "Pa$$w0rd"
+    },
+    "serverDatabaseName": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "sqlServerName": "[concat('sql',parameters('labInstanceId'))]",
+    "databaseName": "blobTracking",
+    "sqlAdmin": "student",
+    "sqlPassword": "[concat('Azure!',parameters('labPassword'))]"
+
+  },
+  "resources": [
+    {
+      "name": "[concat(parameters('serverDatabaseName'), '/', 'DatabaseImport')]",
+      "type": "Microsoft.Sql/servers/databases/extensions",
+      "apiVersion": "2014-04-01-preview",
+      "dependsOn": [],
+      "tags": {
+        "displayName": "DatabaseImport"
+      },
+      "properties": {
+        "storageKeyType": "SharedAccessKey",
+        "storageKey": "?",
+        "storageUri": "[parameters('blobTrackingSchemaStorageUri')]",
+        "administratorLogin": "[variables('sqlAdmin')]",
+        "administratorLoginPassword": "[variables('sqlPassword')]",
+        "operationMode": "Import"
+      }
+    }
+  ],
+  "outputs": {
+  }
+}
