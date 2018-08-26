@@ -57,5 +57,85 @@ namespace aachallenges.Controllers
             }
             return results;
         }
+        [HttpPost]
+        [Route("loadqueue")]
+        public async Task<EvaluationResults> LoadQueue(Parameters parms)
+        {
+            var results = new EvaluationResults();
+            parms.Fix(Config);
+            try
+            {
+                var context = new StorageContext(parms);
+                results = await context.LoadQueue("process");
+            }
+            catch (Exception ex)
+            {
+                results.Code = ex.HResult;
+                results.Message = $"Error: {ex.Message}";
+                results.Passed = false;
+            }
+            return results;
+        }
+
+        [HttpPost]
+        [Route("verifyqueue")]
+        public async Task<EvaluationResults> VerifyQueue(Parameters parms)
+        {
+            var results = new EvaluationResults();
+            parms.Fix(Config);
+            try
+            {
+                var context = new StorageContext(parms);
+                results = await context.CheckQueue("process");
+            }
+            catch (Exception ex)
+            {
+                results.Code = ex.HResult;
+                results.Message = $"Error: {ex.Message}";
+                results.Passed = false;
+            }
+            return results;
+        }
+
+        [HttpPost]
+        [Route("verifytable")]
+        public async Task<EvaluationResults> VerifyTable(Parameters parms)
+        {
+            var results = new EvaluationResults();
+            parms.Fix(Config);
+            try
+            {
+                var context = new StorageContext(parms);
+                results = await context.CheckTable("history");
+            }
+            catch (Exception ex)
+            {
+                results.Code = ex.HResult;
+                results.Message = $"Error: {ex.Message}";
+                results.Passed = false;
+            }
+            return results;
+        }
+
+        [HttpPost]
+        [Route("loadtable")]
+        public async Task<EvaluationResults> LoadTable(Parameters parms)
+        {
+            var results = new EvaluationResults();
+            parms.Fix(Config);
+            try
+            {
+                var context = new StorageContext(parms);
+                results = await context.LoadTable("history");
+            }
+            catch (Exception ex)
+            {
+                results.Code = ex.HResult;
+                results.Message = $"Error: {ex.Message}";
+                results.Passed = false;
+            }
+            return results;
+        }
+
     }
 }

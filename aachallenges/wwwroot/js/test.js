@@ -1,21 +1,42 @@
 ﻿$(document).ready(function () {
-    $('#verifySql').click(verifySql);
+    $('#verifyFunction').click(verifyFunction);
+    $('#verifyLogic').click(verifyLogic);
+    $('#loadQueue').click(loadQueue);
+    $('#verifyQueue').click(verifyQueue);
+    $('#loadTable').click(loadTable);
+    $('#verifyTable').click(verifyTable);
 
     var documentStatusColumns = [{ ColumnName: "name", Title: "Name" }, { ColumnName: "processed", Title: "Processed Time" }, { ColumnName: "status", Title: "Status" }];
 
-
-
-    function verifySql() {
+    function verifyLogic() {
         showStart("Verifying Logic App results");
         runTest("verifysqldata", getPayload(), "Logic App Verification", documentStatusColumns, showResult, true, true);
-
     }
-
+    function verifyFunction() {
+        showStart("Verify Function App");
+        runTest("verifyqueue", getPayload(), "Function App Verification", documentStatusColumns, showResult, true, true);
+    }
+    function loadQueue() {
+        showStart("Loading Queue messages");
+        runTest("loadqueue", getPayload(), "Queue Load Verification", documentStatusColumns, showResult, false, true);
+    }
+    function verifyQueue() {
+        showStart("Verify Queue Messages");
+        runTest("verifyqueue", getPayload(), "Queue Verification", documentStatusColumns, showResult, true, true);
+    }
+    function loadTable() {
+        showStart("Loading Table Rows");
+        runTest("loadtable", getPayload(), "Table Load Verification", documentStatusColumns, showResult, false, true);
+    }
+    function verifyTable() {
+        showStart("Verify Table Rows");
+        runTest("verifytable", getPayload(), "Table Verification", documentStatusColumns, showResult, true, true);
+    }
     function getPayload(interval, iterations) {
         return {
             storageConnection: "-1",
             sqlConnection: "-1"
-         };
+        };
     }
     function showStart(text) {
         $('#currentTest').text(text);
