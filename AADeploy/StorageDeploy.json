@@ -1,0 +1,107 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "labInstanceId": {
+      "type": "string",
+      "defaultValue": "lods12345abc"
+    },
+    "labPassword": {
+      "type": "string",
+      "defaultValue": "Pa$$w0rd"
+    },
+    "webAppDeployUri": {
+      "type": "string",
+      "defaultValue": "https://github.com/twallace27603/lods-azarch/blob/master/aachallenges/deploy/aachallenges.zip?raw=true"
+    },
+    "testType": {
+      "type": "int",
+      "defaultValue": 63
+    }
+
+  },
+  "variables": {
+    "webAppName": "[concat('lods',parameters('labInstanceId'))]",
+    "appServicePlanName": "[concat('asp-',parameters('labInstanceId'))]",
+    "aspSku": "S1"
+  },
+
+  "resources": [
+     {
+      "name": "[variables('appServicePlanName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-08-01",
+      "sku": {
+        "name": "[variables('aspSku')]"
+      },
+      "dependsOn": [],
+      "tags": {
+        "displayName": "App Service Plan"
+      },
+      "properties": {
+        "name": "[variables('appServicePlanName')]",
+        "numberOfWorkers": 1
+      }
+    },
+    {
+      "name": "[variables('webAppName')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
+      ],
+      "tags": {
+        "[concat('hidden-related:', resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName')))]": "Resource",
+        "displayName": "Web App"
+      },
+      "properties": {
+        "name": "[variables('webAppName')]",
+        "siteConfig": {
+          "AlwaysOn": true
+        },
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
+      },
+      "resources": [
+        {
+          "apiVersion": "2015-08-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('webAppName'))]"
+          ],
+          "location": "[resourceGroup().location]",
+          "name": "MSDeploy",
+          "properties": {
+            "packageUri": "[parameters('webAppDeployUri')]",
+            "dbType": "None",
+            "connectionString": "",
+            "setParameters": {
+              "IIS Web Application Name": "[variables('webAppName')]"
+            }
+          },
+          "tags": {
+            "displayName": "App Code Deployment"
+          },
+          "type": "extensions"
+        },
+        {
+          "name": "appsettings",
+          "type": "config",
+          "apiVersion": "2015-08-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('webappName'))]",
+            "[concat(resourceId('Microsoft.Web/sites', variables('webappName')),'/extensions/MSDeploy')]"
+
+          ],
+          "tags": {
+            "displayName": "webAppSettings"
+          },
+          "properties": {
+            "testType": "[parameters('testType')]"
+          }
+
+        }      ]
+    }
+  ],
+  "outputs": {}
+}
