@@ -1,0 +1,22 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<h2>Azure Service Fabric Challenge Website</h2>
+<table class="table">
+    <thead>
+        <tr><th scope="col">Setting</th><th scope="col">Value</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>Instance</td><td>@ViewBag.Server</td></tr>
+        <tr><td>Process ID</td><td>@ViewBag.PID</td></tr>
+    </tbody>
+</table>
+<hr />
+<button id="test">Test Service</button>
+<div id="testResults">
+
+</div>
+
+@section scripts {
+<script src="~/js/Evaluation.js"></script>
+}
