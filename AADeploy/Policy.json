@@ -1,0 +1,42 @@
+﻿{
+  "if": {
+    "anyof": [
+      {
+        "not": {
+          "field": "type",
+          "in": [
+            "Microsoft.Storage/storageAccounts",
+            "Microsoft.Storage/storageAccounts/*",
+            "Microsoft.Web/serverfarms",
+            "Microsoft.Web/serverfarms/*",
+            "Microsoft.Web/sites/config",
+            "Microsoft.Web/sites/config/*",
+            "Microsoft.web/sites/deployments",
+            "Microsoft.web/sites/deployments/*",
+            "Microsoft.web/sites/functions",
+            "Microsoft.web/sites/functions/*",
+            "Microsoft.web/sites/triggeredwebjobs",
+            "Microsoft.web/sites/triggeredwebjobs/*",
+            "Microsoft.Web/sites",
+            "Microsoft.Web/sites/*",
+            "Microsoft.ContainerInstance/containerGroups",
+            "Microsoft.ContainerInstance/containerGroups/*",
+            "microsoft.insights/components",
+            "microsoft.insights/components/*",
+            "Microsoft.Logic/workflows",
+            "Microsoft.Logic/workflows/*",
+            "Microsoft.Web/connections/",
+            "Microsoft.Web/connections/*"
+
+          ]
+        }
+      }
+    ]
+
+  },
+  "then": {
+    "effect": "deny"
+  }
+}
+
+
