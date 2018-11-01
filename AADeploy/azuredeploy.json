@@ -40,8 +40,8 @@
     "dbServiceLevelObjective": "S0",
     "dbEdition": "Standard",
     "dbCollation": "SQL_Latin1_General_CP1_CI_AS",
-    "deploySQL": "[bool(or(or(equals(parameters('testType'),'2'),equals(parameters('testType'),'3')),equals(parameters('testType'),'63')))]",
-    "deployCI": "[bool(equals(parameters('testType'),'8'))]"
+    "deploySQL": "[bool(or(or(equals(parameters('testType'),2),equals(parameters('testType'),3)),equals(parameters('testType'),63)))]",
+    "deployCI": "[bool(equals(parameters('testType'),8))]"
   },
 
   "resources": [
