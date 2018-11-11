@@ -10,9 +10,6 @@
     },
     "dockerhostAdminPassword": {
       "value": "Pa55w.rd1234"
-    },
-    "dockerhost-PIPDnsName": {
-      "value": "tswdocker1234"
     }
   }
 }

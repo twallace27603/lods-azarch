@@ -20,11 +20,8 @@
         "12.04.5-LTS",
         "18.04-LTS"
       ]
-    },
-    "dockerhost-PIPDnsName": {
-      "type": "string",
-      "minLength": 1
     }
+
   },
   "variables": {
     "customData": "[base64('#cloud-config\npackage_upgrade: true\npackage_reboot_if_required: true\npackages:\n– docker.io\nruncmd:\n– gpasswd -a student docker')]",
@@ -123,8 +120,7 @@
         "osProfile": {
           "computerName": "[parameters('dockerhostName')]",
           "adminUsername": "[parameters('dockerhostAdminUsername')]",
-          "adminPassword": "[parameters('dockerhostAdminPassword')]",
-          "customData": "[variables('customData')]"
+          "adminPassword": "[parameters('dockerhostAdminPassword')]"
         },
         "storageProfile": {
           "imageReference": {
@@ -146,7 +142,33 @@
             }
           ]
         }
-      }
+      },
+      "resources": [
+        {
+          "name": "installdocker",
+          "type": "extensions",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2016-03-30",
+          "dependsOn": [
+            "[resourceId('Microsoft.Compute/virtualMachines', parameters('dockerhostName'))]"
+          ],
+          "tags": {
+            "displayName": "installdocker"
+          },
+          "properties": {
+            "publisher": "Microsoft.OSTCExtensions",
+            "type": "CustomScriptForLinux",
+            "typeHandlerVersion": "1.4",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "fileUris": [
+                "https://raw.githubusercontent.com/twallace27603/lods-azarch/master/AADeploy/InstallDocker.sh"
+              ],
+              "commandToExecute": "sh InstallDocker.sh"
+            }
+          }
+        }
+      ]
     },
     {
       "name": "[variables('dockerhost-PIPName')]",
@@ -158,10 +180,7 @@
         "displayName": "dockerhost-PIP"
       },
       "properties": {
-        "publicIPAllocationMethod": "Dynamic",
-        "dnsSettings": {
-          "domainNameLabel": "[parameters('dockerhost-PIPDnsName')]"
-        }
+        "publicIPAllocationMethod": "Dynamic"
       }
     }
   ],

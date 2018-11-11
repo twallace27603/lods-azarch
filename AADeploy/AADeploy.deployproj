@@ -27,6 +27,7 @@
     <Content Include="azuredeploy.json" />
     <Content Include="azuredeploy.parameters.json" />
     <Content Include="DeployDatabase.json" />
+    <Content Include="CustomScripts\installdocker.sh" />
     <None Include="Deployment.targets">
       <Visible>False</Visible>
     </None>
