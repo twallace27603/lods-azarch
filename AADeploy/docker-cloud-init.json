@@ -162,7 +162,7 @@
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": [
-                "https://raw.githubusercontent.com/twallace27603/lods-azarch/master/AADeploy/InstallDocker.sh"
+                "https://raw.githubusercontent.com/twallace27603/lods-azarch/master/AADeploy/installdocker.sh"
               ],
               "commandToExecute": "sh InstallDocker.sh"
             }
