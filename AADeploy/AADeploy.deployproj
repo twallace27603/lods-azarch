@@ -31,6 +31,9 @@
       <Visible>False</Visible>
     </None>
     <Content Include="Deploy-AzureResourceGroup.ps1" />
+    <Content Include="docker-cloud-init.json" />
+    <Content Include="docker-cloud-init.parameters.json" />
+    <None Include="InstallDocker.sh" />
     <None Include="Policy.json" />
     <None Include="ServiceFabric.json" />
   </ItemGroup>
