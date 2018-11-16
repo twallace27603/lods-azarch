@@ -2,88 +2,73 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "dockerhostName": {
-      "type": "string",
-      "minLength": 1
+    "labInstanceId": {
+      "type": "string"
     },
-    "dockerhostAdminUserName": {
-      "type": "string",
-      "minLength": 1
+    "labPassword": {
+      "type": "string"
     },
-    "dockerhostAdminPassword": {
-      "type": "securestring"
-    },
-    "dockerhostUbuntuOSVersion": {
-      "type": "string",
-      "defaultValue": "18.04-LTS",
-      "allowedValues": [
-        "12.04.5-LTS",
-        "18.04-LTS"
-      ]
+    "testType": {
+      "type": "int",
+      "defaultValue": 4
     }
-
   },
   "variables": {
-    "customData": "[base64('#cloud-config\npackage_upgrade: true\npackage_reboot_if_required: true\npackages:\n– docker.io\nruncmd:\n– gpasswd -a student docker')]",
-    "dockerhost-VNetPrefix": "10.0.0.0/16",
-    "dockerhost-VNetSubnet1Name": "Subnet-1",
-    "dockerhost-VNetSubnet1Prefix": "10.0.0.0/24",
-    "dockerhost-VNetSubnet2Name": "Subnet-2",
-    "dockerhost-VNetSubnet2Prefix": "10.0.1.0/24",
-    "dockerhostImagePublisher": "Canonical",
-    "dockerhostImageOffer": "UbuntuServer",
-    "dockerhostOSDiskName": "dockerhostOSDisk",
-    "dockerhostVmSize": "Standard_D2_v2",
-    "dockerhostVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'dockerhost-VNet')]",
-    "dockerhostSubnetRef": "[concat(variables('dockerhostVnetID'), '/subnets/', variables('dockerhost-VNetSubnet1Name'))]",
-    "dockerhostStorageAccountContainerName": "vhds",
-    "dockerhostNicName": "[concat(parameters('dockerhostName'), 'NetworkInterface')]",
-    "dockerhost-PIPName": "dockerhost-PIP"
+    "vmName": "dockerHost",
+    "adminUserName": "student",
+    "adminPassword": "[concat('Azure!',parameters('labPassword'))]",
+    "VNetPrefix": "10.0.0.0/16",
+    "VNetSubnet1Name": "default",
+    "VNetSubnet1Prefix": "10.0.0.0/24",
+    "ImagePublisher": "Canonical",
+    "ImageOffer": "UbuntuServer",
+    "OSDiskName": "OSDisk",
+    "ubuntuOSVersion": "18.04-LTS",
+    "VmSize": "Standard_D2_v2",
+    "vnetName": "[concat(variables('vmName'),'-VNet')]",
+    "VnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
+    "SubnetRef": "[concat(variables('VnetID'), '/subnets/', variables('VNetSubnet1Name'))]",
+    "NicName": "[concat(variables('vmName'), '-NIC')]",
+    "PIPName": "[concat(variables('vmName'),'-PIP')]"
   },
   "resources": [
 
     {
-      "name": "dockerhost-VNet",
+      "name": "[variables('vnetName')]",
       "type": "Microsoft.Network/virtualNetworks",
       "location": "[resourceGroup().location]",
       "apiVersion": "2016-03-30",
-      "dependsOn": [ ],
+      "dependsOn": [],
       "tags": {
-        "displayName": "dockerhost-VNet"
+        "displayName": "VNet"
       },
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
-            "[variables('dockerhost-VNetPrefix')]"
+            "[variables('VNetPrefix')]"
           ]
         },
         "subnets": [
           {
-            "name": "[variables('dockerhost-VNetSubnet1Name')]",
+            "name": "[variables('VNetSubnet1Name')]",
             "properties": {
-              "addressPrefix": "[variables('dockerhost-VNetSubnet1Prefix')]"
-            }
-          },
-          {
-            "name": "[variables('dockerhost-VNetSubnet2Name')]",
-            "properties": {
-              "addressPrefix": "[variables('dockerhost-VNetSubnet2Prefix')]"
+              "addressPrefix": "[variables('VNetSubnet1Prefix')]"
             }
           }
         ]
       }
     },
     {
-      "name": "[variables('dockerhostNicName')]",
+      "name": "[variables('NicName')]",
       "type": "Microsoft.Network/networkInterfaces",
       "location": "[resourceGroup().location]",
       "apiVersion": "2016-03-30",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks', 'dockerhost-VNet')]",
-        "[resourceId('Microsoft.Network/publicIPAddresses', variables('dockerhost-PIPName'))]"
+        "[variables('VnetID')]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('PIPName'))]"
       ],
       "tags": {
-        "displayName": "dockerhostNic"
+        "displayName": "Nic"
       },
       "properties": {
         "ipConfigurations": [
@@ -92,10 +77,10 @@
             "properties": {
               "privateIPAllocationMethod": "Dynamic",
               "subnet": {
-                "id": "[variables('dockerhostSubnetRef')]"
+                "id": "[variables('SubnetRef')]"
               },
               "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('dockerhost-PIPName'))]"
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('PIPName'))]"
               }
             }
           }
@@ -103,34 +88,34 @@
       }
     },
     {
-      "name": "[parameters('dockerhostName')]",
+      "name": "[variables('vmName')]",
       "type": "Microsoft.Compute/virtualMachines",
       "location": "[resourceGroup().location]",
       "apiVersion": "2017-03-30",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/networkInterfaces', variables('dockerhostNicName'))]"
+        "[resourceId('Microsoft.Network/networkInterfaces', variables('NicName'))]"
       ],
       "tags": {
-        "displayName": "dockerhost"
+        "displayName": ""
       },
       "properties": {
         "hardwareProfile": {
-          "vmSize": "[variables('dockerhostVmSize')]"
+          "vmSize": "[variables('VmSize')]"
         },
         "osProfile": {
-          "computerName": "[parameters('dockerhostName')]",
-          "adminUsername": "[parameters('dockerhostAdminUsername')]",
-          "adminPassword": "[parameters('dockerhostAdminPassword')]"
+          "computerName": "[variables('vmName')]",
+          "adminUsername": "[variables('adminUserName')]",
+          "adminPassword": "[variables('adminPassword')]"
         },
         "storageProfile": {
           "imageReference": {
-            "publisher": "[variables('dockerhostImagePublisher')]",
-            "offer": "[variables('dockerhostImageOffer')]",
-            "sku": "[parameters('dockerhostUbuntuOSVersion')]",
+            "publisher": "[variables('ImagePublisher')]",
+            "offer": "[variables('ImageOffer')]",
+            "sku": "[variables('ubuntuOSVersion')]",
             "version": "latest"
           },
           "osDisk": {
-            "name": "dockerhostOSDisk",
+            "name": "OSDisk",
             "caching": "ReadWrite",
             "createOption": "FromImage"
           }
@@ -138,7 +123,7 @@
         "networkProfile": {
           "networkInterfaces": [
             {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('dockerhostNicName'))]"
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('NicName'))]"
             }
           ]
         }
@@ -150,7 +135,7 @@
           "location": "[resourceGroup().location]",
           "apiVersion": "2016-03-30",
           "dependsOn": [
-            "[resourceId('Microsoft.Compute/virtualMachines', parameters('dockerhostName'))]"
+            "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'))]"
           ],
           "tags": {
             "displayName": "installdocker"
@@ -171,13 +156,13 @@
       ]
     },
     {
-      "name": "[variables('dockerhost-PIPName')]",
+      "name": "[variables('PIPName')]",
       "type": "Microsoft.Network/publicIPAddresses",
       "location": "[resourceGroup().location]",
       "apiVersion": "2016-03-30",
-      "dependsOn": [ ],
+      "dependsOn": [],
       "tags": {
-        "displayName": "dockerhost-PIP"
+        "displayName": "PIP"
       },
       "properties": {
         "publicIPAllocationMethod": "Dynamic"
@@ -185,5 +170,9 @@
     }
   ],
   "outputs": {
+    "Password": {
+      "type": "string",
+      "value": "[variables('adminPassword')]"
+    }
   }
 }

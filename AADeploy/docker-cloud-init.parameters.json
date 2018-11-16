@@ -2,14 +2,11 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "dockerhostName": {
-      "value": "dockerhost"
+    "labInstanceId": {
+      "value": "tsw1234"
     },
-    "dockerhostAdminUserName": {
-      "value": "student"
-    },
-    "dockerhostAdminPassword": {
-      "value": "Pa55w.rd1234"
+    "labPassword": {
+      "value": "1234"
     }
   }
 }
