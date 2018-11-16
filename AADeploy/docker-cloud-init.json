@@ -12,6 +12,7 @@
       "type": "int",
       "defaultValue": 4
     }
+
   },
   "variables": {
     "vmName": "dockerHost",
@@ -29,7 +30,9 @@
     "VnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
     "SubnetRef": "[concat(variables('VnetID'), '/subnets/', variables('VNetSubnet1Name'))]",
     "NicName": "[concat(variables('vmName'), '-NIC')]",
-    "PIPName": "[concat(variables('vmName'),'-PIP')]"
+    "PIPName": "[concat(variables('vmName'),'-PIP')]",
+    "storageName": "[concat('sa', parameters('labInstanceId'))]",
+    "storageType": "Standard_LRS"
   },
   "resources": [
 
@@ -167,6 +170,20 @@
       "properties": {
         "publicIPAllocationMethod": "Dynamic"
       }
+    },
+    {
+      "name": "[variables('storageName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-01-01",
+      "sku": {
+        "name": "[variables('storageType')]"
+      },
+      "dependsOn": [],
+      "tags": {
+        "displayName": "Storage Account"
+      },
+      "kind": "Storage"
     }
   ],
   "outputs": {
