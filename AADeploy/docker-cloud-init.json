@@ -168,7 +168,10 @@
         "displayName": "PIP"
       },
       "properties": {
-        "publicIPAllocationMethod": "Dynamic"
+        "publicIPAllocationMethod": "Dynamic",
+        "dnsSettings": {
+          "domainNameLabel": "[concat('dhpip',parameters('labInstanceId'))]"
+        }
       }
     },
     {
