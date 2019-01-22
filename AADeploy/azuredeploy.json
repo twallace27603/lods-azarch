@@ -236,8 +236,10 @@
           "apiVersion": "2015-08-01",
           "name": "connectionstrings",
           "type": "config",
+          "condition": "[variables('deployStorage')]",
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('webappName'))]",
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]",
             "[concat(resourceId('Microsoft.Web/sites', variables('webappName')),'/extensions/MSDeploy')]",
             "[concat(resourceId('Microsoft.Web/sites', variables('webappName')),'/config/appsettings')]"
           ],
