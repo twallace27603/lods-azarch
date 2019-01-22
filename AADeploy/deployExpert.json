@@ -28,12 +28,9 @@
   "variables": {
     "sqlServerName": "[concat('sql',parameters('labInstanceId'))]",
     "databaseName": "blobTracking",
-    "storageName": "[concat('sa',parameters('labInstanceId'))]",
     "webAppName": "[concat('lods',parameters('labInstanceId'))]",
     "containerInstanceAppName": "[concat('lods',parameters('labInstanceId'))]",
     "appServicePlanName": "[concat('asp-',parameters('labInstanceId'))]",
-    "storageAccountSku": "Standard_LRS",
-    "storageAccountId": "[concat(resourceGroup().id,'/providers/Microsoft.Storage/storageAccounts/', variables('storageName'))]",
     "aspSku": "S1",
     "sqlAdmin": "student",
     "sqlPassword": "[concat('Azure!',parameters('labPassword'))]",
@@ -96,66 +93,7 @@
       ]
     },
 
-    {
-      "type": "Microsoft.ContainerInstance/containerGroups",
-      "name": "[variables('containerInstanceAppName')]",
-      "apiVersion": "2018-04-01",
-      "location": "[resourceGroup().location]",
-      "condition": "[variables('deployCI')]",
-      "scale": null,
-      "properties": {
-        "containers": [
-          {
-            "name": "[variables('containerInstanceAppName')]",
-            "properties": {
-              "image": "notlods/exampleservice:1.0",
-              "command": [],
-              "ports": [
-                {
-                  "protocol": "TCP",
-                  "port": 8080
-                }
-              ],
-              "environmentVariables": [],
-              "resources": {
-                "requests": {
-                  "memoryInGB": 1.5,
-                  "cpu": 1
-                }
-              }
-            }
-          }
-        ],
-        "restartPolicy": "Always",
-        "ipAddress": {
-          "ports": [
-            {
-              "protocol": "TCP",
-              "port": 8080
-            }
-          ],
-          "ip": "23.99.183.71",
-          "type": "Public"
-        },
-        "osType": "Linux"
-      },
-      "dependsOn": []
-    },
-
-    {
-      "name": "[variables('storageName')]",
-      "type": "Microsoft.Storage/storageAccounts",
-      "location": "[resourceGroup().location]",
-      "apiVersion": "2016-01-01",
-      "sku": {
-        "name": "[variables('storageAccountSku')]"
-      },
-      "dependsOn": [],
-      "tags": {
-        "displayName": "Storage Account"
-      },
-      "kind": "Storage"
-    },
+ 
     {
       "name": "[variables('appServicePlanName')]",
       "type": "Microsoft.Web/serverfarms",
@@ -240,10 +178,6 @@
             "[concat(resourceId('Microsoft.Web/sites', variables('webappName')),'/config/appsettings')]"
           ],
           "properties": {
-            "storageConnection": {
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageName'),';AccountKey=',concat(listKeys(variables('storageAccountId'),'2015-05-01-preview').key1),';EndpointSuffix=core.windows.net')]",
-              "type": "Custom"
-            },
             "sqlConnection": {
               "value": "[concat('Server=tcp:',variables('sqlServerName'),'.database.windows.net,1433;Initial Catalog=blobTracking;Persist Security Info=False;User ID=',variables('sqlAdmin'),';Password=',variables('sqlPassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;')]",
               "type": "SQLAzure"
