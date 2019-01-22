@@ -41,6 +41,7 @@
     "dbEdition": "Standard",
     "dbCollation": "SQL_Latin1_General_CP1_CI_AS",
     "deploySQL": "[bool(or(or(equals(parameters('testType'),2),equals(parameters('testType'),3)),equals(parameters('testType'),63)))]",
+    "deployStorage": "[not(bool(equals(parameters('testType'),63)))]",
     "deployCI": "[bool(equals(parameters('testType'),8))]"
   },
 
@@ -147,6 +148,7 @@
       "type": "Microsoft.Storage/storageAccounts",
       "location": "[resourceGroup().location]",
       "apiVersion": "2016-01-01",
+      "condition": "[variables('deployStorage')]",
       "sku": {
         "name": "[variables('storageAccountSku')]"
       },
