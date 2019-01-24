@@ -32,7 +32,8 @@
     "NicName": "[concat(variables('vmName'), '-NIC')]",
     "PIPName": "[concat(variables('vmName'),'-PIP')]",
     "storageName": "[concat('sa', parameters('labInstanceId'))]",
-    "storageType": "Standard_LRS"
+    "storageType": "Standard_LRS",
+    "deployStorage": "[bool(not(equals(parameters('testType'),63)))]"
   },
   "resources": [
 
@@ -179,6 +180,7 @@
       "type": "Microsoft.Storage/storageAccounts",
       "location": "[resourceGroup().location]",
       "apiVersion": "2016-01-01",
+      "condition": "[variables('deployStorage')]",
       "sku": {
         "name": "[variables('storageType')]"
       },
